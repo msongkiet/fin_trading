@@ -37,7 +37,7 @@ for j in range(len(tickers)):
                 msg_pre_sell += f'{tickers[j]} '
     except Exception as e:
         print(e)
-        
+
 line_notify(f'TF {tf} Crypto Golden Cross: {msg_golden_cross}', token)
 line_notify(f'TF {tf} Crypto Dead Cross: {msg_dead_cross}', token)
 line_notify(f'TF {tf} Crypto Pre-Buy Zone: {msg_pre_buy}', token)
