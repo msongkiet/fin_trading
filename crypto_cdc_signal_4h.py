@@ -22,19 +22,22 @@ msg_pre_sell = ''
 tf = '4h'
 
 for j in range(len(tickers)):
-    price_df = get_crypto_price(tickers[j], tf)
-    price_df = cdc_indi(price_df)
-    signal = cdc_scan(price_df)
-    if(len(signal)!=0):
-        if(signal == 'bullish'):
-            msg_golden_cross += f'{tickers[j]} '
-        elif(signal == 'bearish'):
-            msg_dead_cross += f'{tickers[j]} '
-        elif(signal == 'blue'):
-            msg_pre_buy += f'{tickers[j]} '
-        elif(signal == 'yellow'):
-            msg_pre_sell += f'{tickers[j]} '
-
+    try:
+        price_df = get_crypto_price(tickers[j], tf)
+        price_df = cdc_indi(price_df)
+        signal = cdc_scan(price_df)
+        if(len(signal)!=0):
+            if(signal == 'bullish'):
+                msg_golden_cross += f'{tickers[j]} '
+            elif(signal == 'bearish'):
+                msg_dead_cross += f'{tickers[j]} '
+            elif(signal == 'blue'):
+                msg_pre_buy += f'{tickers[j]} '
+            elif(signal == 'yellow'):
+                msg_pre_sell += f'{tickers[j]} '
+    except Exception as e:
+        print(e)
+        
 line_notify(f'TF {tf} Crypto Golden Cross: {msg_golden_cross}', token)
 line_notify(f'TF {tf} Crypto Dead Cross: {msg_dead_cross}', token)
 line_notify(f'TF {tf} Crypto Pre-Buy Zone: {msg_pre_buy}', token)
