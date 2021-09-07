@@ -6,7 +6,8 @@ from line_notify import line_notify
 import pandas as pd
 import os
 
-token = os.environ.get('token_line_trading_signal')
+# token = os.environ.get('token_line_trading_signal')
+token = os.environ.get('token_line_test')
 googleSheetId = os.environ.get('googleSheetId_quote')
 
 worksheetName = ['SET100', 'sSET']
