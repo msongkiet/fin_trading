@@ -1,6 +1,7 @@
 from yf_price import get_yf_price
 from cdc_indi import cdc_indi
 from cdc_scan import cdc_scan
+from vol_indi import vol_indi
 from line_notify import line_notify
 
 import pandas as pd
@@ -21,12 +22,16 @@ for i in range(len(worksheetName)):
     msg_dead_cross = ''
     msg_pre_buy = ''
     msg_pre_sell = ''
+    df_vol = pd.DataFrame()
 
     for j in range(len(tickers)):
         try:
-            price_df = get_yf_price(tickers[j])
-            price_df = cdc_indi(price_df)
-            signal = cdc_scan(price_df)
+            df_price = get_yf_price(tickers[j])
+            df_price = cdc_indi(df_price)
+            df_price = vol_indi(df_price)
+            df_vol = df_vol.append(df_price.tail(1),ignore_index=False)
+
+            signal = cdc_scan(df_price)
             if(len(signal)!=0):
                 if(signal == 'bullish'):
                     msg_golden_cross += f'{tickers[j].split(".")[0]} '
@@ -39,7 +44,17 @@ for i in range(len(worksheetName)):
         except Exception as e:
             print(e)
 
+    df_vol = df_vol.sort_values(by=['x_of_vol_ma'],ascending=False)   
+    msg_vol_change = ''
+
+    for row in df_vol.itertuples():
+        if row.x_of_vol_ma >= 1.50:
+            msg_vol_change += f'{row.ticker}:{row.x_of_vol_ma}X, '
+        else:
+            break
+
     line_notify(f'{worksheetName[i]} CDC Golden Cross: {msg_golden_cross}', token)
     line_notify(f'{worksheetName[i]} CDC Dead Cross: {msg_dead_cross}', token)
     line_notify(f'{worksheetName[i]} CDC Pre-Buy Zone: {msg_pre_buy}', token)
     line_notify(f'{worksheetName[i]} CDC Pre-Sell Zone: {msg_pre_sell}', token)
+    line_notify(f'{worksheetName[i]} Vol change (x of vol ma): {msg_vol_change}', token)
