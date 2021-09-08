@@ -14,11 +14,11 @@ def get_yf_price(ticker, period = '3mo'):
     try:
         df = yf.Ticker(ticker)
         df = df.history(period=period)
-        # df = df.drop(columns=['Volume', 'Dividends', 'Stock Splits'])
         df = df.drop(columns=['Dividends', 'Stock Splits'])
-        df['ohlc4'] = df.mean(axis=1)
+        df['ticker'] = ticker.split(".")[0]
+        df['ohlc4'] = df[['Open', 'High', 'Low', 'Close']].mean(axis=1)
         df = df.drop(columns=['Open', 'High', 'Low', 'Close'])
-        
+        # print(df)
         return df
     except Exception as e:
         print(e)
