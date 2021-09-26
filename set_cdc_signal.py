@@ -37,19 +37,19 @@ for k in range(len(period)):
                 df_price = get_yf_price(tickers[j], period[k], interval[k])
                 df_price = cdc_indi(df_price)
                 df_price = vol_indi(df_price)
-                print(f'{tickers[j]} {df_price.shape}')
+                print('{0} {1}'.format(tickers[j], df_price.shape))
                 df_vol = df_vol.append(df_price.tail(1),ignore_index=False)
 
                 signal = cdc_scan(df_price)
                 if(len(signal)!=0):
                     if(signal == 'bullish'):
-                        msg_golden_cross += f'{tickers[j].split(".")[0]} '
+                        msg_golden_cross += '{0} '.format(tickers[j].split(".")[0])
                     elif(signal == 'bearish'):
-                        msg_dead_cross += f'{tickers[j].split(".")[0]} '
+                        msg_dead_cross += '{0} '.format(tickers[j].split(".")[0])
                     elif(signal == 'blue'):
-                        msg_pre_buy += f'{tickers[j].split(".")[0]} '
+                        msg_pre_buy += '{0} '.format(tickers[j].split(".")[0])
                     elif(signal == 'yellow'):
-                        msg_pre_sell += f'{tickers[j].split(".")[0]} '
+                        msg_pre_sell += '{0} '.format(tickers[j].split(".")[0])
             except Exception as e:
                 print(e)
 
@@ -58,12 +58,18 @@ for k in range(len(period)):
 
         for row in df_vol.itertuples():
             if row.x_of_vol_ma >= 1.50:
-                msg_vol_change += f'{row.ticker}:{row.x_of_vol_ma}X, '
+                msg_vol_change += '{0}:{1}X, '.format(row.ticker, row.x_of_vol_ma)
             else:
                 break
+ 
+        # line_notify(f'{worksheetName[i]} TF:{interval[k]} CDC Golden Cross: {msg_golden_cross}', token)
+        line_notify('{0} TF:{1} CDC Golden Cross: {2}'.format(worksheetName[i], interval[k], msg_golden_cross), token)
+        line_notify('{0} TF:{1} CDC Dead Cross: {2}'.format(worksheetName[i], interval[k], msg_dead_cross), token)
+        line_notify('{0} TF:{1} CDC Pre-Buy Zone: {2}'.format(worksheetName[i], interval[k], msg_pre_buy), token)
+        line_notify('{0} TF:{1} CDC Pre-Sell Zone: {2}'.format(worksheetName[i], interval[k], msg_pre_sell), token)
+        line_notify('{0} TF:{1} Vol change (x of vol ma): {2}'.format(worksheetName[i], interval[k], msg_vol_change), token)
 
-        line_notify(f'{worksheetName[i]} TF:{interval[k]} CDC Golden Cross: {msg_golden_cross}', token)
-        line_notify(f'{worksheetName[i]} TF:{interval[k]} CDC Dead Cross: {msg_dead_cross}', token)
-        line_notify(f'{worksheetName[i]} TF:{interval[k]} CDC Pre-Buy Zone: {msg_pre_buy}', token)
-        line_notify(f'{worksheetName[i]} TF:{interval[k]} CDC Pre-Sell Zone: {msg_pre_sell}', token)
-        line_notify(f'{worksheetName[i]} TF:{interval[k]} Vol change (x of vol ma): {msg_vol_change}', token)
+        # line_notify(f'{worksheetName[i]} TF:{interval[k]} CDC Dead Cross: {msg_dead_cross}', token)
+        # line_notify(f'{worksheetName[i]} TF:{interval[k]} CDC Pre-Buy Zone: {msg_pre_buy}', token)
+        # line_notify(f'{worksheetName[i]} TF:{interval[k]} CDC Pre-Sell Zone: {msg_pre_sell}', token)
+        # line_notify(f'{worksheetName[i]} TF:{interval[k]} Vol change (x of vol ma): {msg_vol_change}', token)
